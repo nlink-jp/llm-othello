@@ -1,6 +1,7 @@
 const boardElement = document.getElementById('board');
 const messageElement = document.getElementById('message');
 const errorElement = document.getElementById('error');
+const reasonElement = document.getElementById('reason');
 const resetButton = document.getElementById('reset-button');
 
 const BOARD_SIZE = 8;
@@ -24,6 +25,7 @@ function initializeGame() {
     board[4][4] = WHITE;
     currentPlayer = HUMAN_PLAYER;
     clearError();
+    clearReason();
     drawBoard();
     updateMessage();
 }
@@ -74,6 +76,19 @@ function showError(msg) {
 
 function clearError() {
     errorElement.textContent = '';
+}
+
+function showReason(text) {
+    if (!text) return;
+    reasonElement.classList.remove('fade-in');
+    void reasonElement.offsetWidth; // reflow to restart animation
+    reasonElement.textContent = text;
+    reasonElement.classList.add('fade-in');
+}
+
+function clearReason() {
+    reasonElement.textContent = '';
+    reasonElement.classList.remove('fade-in');
 }
 
 // ---- Game logic ------------------------------------------------------------
@@ -199,6 +214,7 @@ async function makeCpuMove() {
     const valid = chosenMove && validMoves.find(m => m.r === chosenMove.row && m.c === chosenMove.col);
     if (valid) {
         placePieceAndFlip(valid.r, valid.c, CPU_PLAYER);
+        showReason(chosenMove.reason);
     } else {
         const random = validMoves[Math.floor(Math.random() * validMoves.length)];
         placePieceAndFlip(random.r, random.c, CPU_PLAYER);

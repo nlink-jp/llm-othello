@@ -94,6 +94,41 @@ h1 {
   min-height: 1.2em;
 }
 
+#reason-box {
+  margin-top: 14px;
+  width: 448px; /* 8 × 56px = board width */
+  min-height: 48px;
+  background-color: #f8f8f2;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-size: 0.88em;
+  color: #444;
+  line-height: 1.5;
+}
+
+#reason-label {
+  font-size: 0.78em;
+  font-weight: bold;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+
+#reason {
+  white-space: pre-wrap;
+}
+
+#reason.fade-in {
+  animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 #reset-button {
   margin-top: 16px;
   padding: 10px 28px;

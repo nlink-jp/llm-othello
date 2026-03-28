@@ -65,8 +65,9 @@ type Move struct {
 }
 
 type MoveResponse struct {
-	Row int `json:"row"`
-	Col int `json:"col"`
+	Row    int    `json:"row"`
+	Col    int    `json:"col"`
+	Reason string `json:"reason,omitempty"`
 }
 
 // ---- LLM client ------------------------------------------------------------
@@ -138,16 +139,15 @@ func askLLM(cfg LLMConfig, req MoveRequest) (MoveResponse, error) {
 	log.Printf("LLM response: %s", content)
 
 	var move MoveResponse
-	if err := json.Unmarshal([]byte(content), &move); err != nil {
-		// Try to extract JSON from surrounding text
-		if m := jsonRe.FindString(content); m != "" {
-			if err2 := json.Unmarshal([]byte(m), &move); err2 != nil {
-				return MoveResponse{}, fmt.Errorf("cannot parse LLM move from: %s", content)
-			}
-		} else {
-			return MoveResponse{}, fmt.Errorf("cannot parse LLM move from: %s", content)
-		}
+	loc := jsonRe.FindStringIndex(content)
+	if loc == nil {
+		return MoveResponse{}, fmt.Errorf("cannot find JSON in LLM response: %s", content)
 	}
+	jsonPart := content[loc[0]:loc[1]]
+	if err2 := json.Unmarshal([]byte(jsonPart), &move); err2 != nil {
+		return MoveResponse{}, fmt.Errorf("cannot parse LLM move from: %s", content)
+	}
+	move.Reason = strings.TrimSpace(content[:loc[0]])
 	return move, nil
 }
 
