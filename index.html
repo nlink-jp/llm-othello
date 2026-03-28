@@ -10,7 +10,24 @@
   <h1>LLM Othello</h1>
   <p class="subtitle">あなた (黒) vs LLM (白)</p>
   <div id="game-container">
-    <div id="board"></div>
+    <div id="board-wrapper">
+      <div id="col-labels">
+        <div class="axis-corner"></div>
+        <div class="axis-label">0</div><div class="axis-label">1</div>
+        <div class="axis-label">2</div><div class="axis-label">3</div>
+        <div class="axis-label">4</div><div class="axis-label">5</div>
+        <div class="axis-label">6</div><div class="axis-label">7</div>
+      </div>
+      <div id="board-row">
+        <div id="row-labels">
+          <div class="axis-label">0</div><div class="axis-label">1</div>
+          <div class="axis-label">2</div><div class="axis-label">3</div>
+          <div class="axis-label">4</div><div class="axis-label">5</div>
+          <div class="axis-label">6</div><div class="axis-label">7</div>
+        </div>
+        <div id="board"></div>
+      </div>
+    </div>
     <div id="message"></div>
     <div id="error"></div>
     <div id="reason-box">

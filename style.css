@@ -32,6 +32,49 @@ h1 {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
+#board-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+#col-labels {
+  display: flex;
+  padding-left: 20px; /* align with board, offset for row-labels width */
+}
+
+#board-row {
+  display: flex;
+  flex-direction: row;
+}
+
+#row-labels {
+  display: flex;
+  flex-direction: column;
+  width: 20px;
+}
+
+.axis-corner {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.axis-label {
+  width: 56px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75em;
+  color: #888;
+  flex-shrink: 0;
+}
+
+#row-labels .axis-label {
+  width: 20px;
+  height: 56px;
+}
+
 #board {
   display: grid;
   grid-template-columns: repeat(8, 56px);
@@ -96,7 +139,7 @@ h1 {
 
 #reason-box {
   margin-top: 14px;
-  width: 448px; /* 8 × 56px = board width */
+  width: 468px; /* 8 × 56px + 20px row-labels */
   min-height: 48px;
   background-color: #f8f8f2;
   border: 1px solid #ddd;
