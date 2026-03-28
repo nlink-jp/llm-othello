@@ -99,11 +99,11 @@ func askLLM(cfg LLMConfig, req MoveRequest) (MoveResponse, error) {
 	body, err := json.Marshal(chatRequest{
 		Model: cfg.Model,
 		Messages: []message{
-			{Role: "system", Content: "You are an Othello AI. You always reply with a single JSON object and nothing else."},
+			{Role: "system", Content: "You are an expert Othello (Reversi) AI playing as White. Reason briefly about your best move, then output a single JSON object on the last line."},
 			{Role: "user", Content: prompt},
 		},
 		Temperature: cfg.Temperature,
-		MaxTokens:   64,
+		MaxTokens:   256,
 	})
 	if err != nil {
 		return MoveResponse{}, err
@@ -151,14 +151,48 @@ func askLLM(cfg LLMConfig, req MoveRequest) (MoveResponse, error) {
 	return move, nil
 }
 
+// squareWeights is the classic Othello positional weight table.
+var squareWeights = [8][8]int{
+	{100, -20, 10, 5, 5, 10, -20, 100},
+	{-20, -40, -5, -5, -5, -5, -40, -20},
+	{10, -5, 3, 3, 3, 3, -5, 10},
+	{5, -5, 3, 3, 3, 3, -5, 5},
+	{5, -5, 3, 3, 3, 3, -5, 5},
+	{10, -5, 3, 3, 3, 3, -5, 10},
+	{-20, -40, -5, -5, -5, -5, -40, -20},
+	{100, -20, 10, 5, 5, 10, -20, 100},
+}
+
 func buildPrompt(board [8][8]int, validMoves []Move) string {
 	var sb strings.Builder
-	sb.WriteString("Current Othello board (B=Black/human, W=White/you, .=empty). Rows and columns are 0-indexed (0–7).\n\n")
 
-	// Column header
-	sb.WriteString("  0 1 2 3 4 5 6 7\n")
+	sb.WriteString(`## Your role
+You are an expert Othello (Reversi) player. You play as White (W). Your goal is to win.
+
+## Strategic priorities (follow in order)
+1. TAKE corners immediately: (0,0) (0,7) (7,0) (7,7) — stable forever, highest value
+2. AVOID X-squares: (1,1) (1,6) (6,1) (6,6) — directly gives opponent corner access
+3. AVOID C-squares next to unowned corners: (0,1) (1,0) (0,6) (1,7) (6,0) (7,1) (6,7) (7,6)
+4. Prefer moves that leave the opponent with fewer valid moves (mobility advantage)
+5. Among remaining options, prefer higher square value
+
+## Square value map (higher = better)
+     col: 0    1    2    3    4    5    6    7
+row 0:  100  -20   10    5    5   10  -20  100
+row 1:  -20  -40   -5   -5   -5   -5  -40  -20
+row 2:   10   -5    3    3    3    3   -5   10
+row 3:    5   -5    3    3    3    3   -5    5
+row 4:    5   -5    3    3    3    3   -5    5
+row 5:   10   -5    3    3    3    3   -5   10
+row 6:  -20  -40   -5   -5   -5   -5  -40  -20
+row 7:  100  -20   10    5    5   10  -20  100
+
+## Current board (B=Black/human, W=White/you, .=empty)
+`)
+
+	sb.WriteString("     col: 0 1 2 3 4 5 6 7\n")
 	for r := 0; r < 8; r++ {
-		fmt.Fprintf(&sb, "%d ", r)
+		fmt.Fprintf(&sb, "row %d:    ", r)
 		for c := 0; c < 8; c++ {
 			switch board[r][c] {
 			case 1:
@@ -172,11 +206,13 @@ func buildPrompt(board [8][8]int, validMoves []Move) string {
 		sb.WriteByte('\n')
 	}
 
-	sb.WriteString("\nYour valid moves:")
+	sb.WriteString("\n## Your valid moves (row, col) → square value\n")
 	for _, m := range validMoves {
-		fmt.Fprintf(&sb, " (%d,%d)", m.R, m.C)
+		w := squareWeights[m.R][m.C]
+		fmt.Fprintf(&sb, "- (%d, %d) → %+d\n", m.R, m.C, w)
 	}
-	sb.WriteString("\n\nChoose the best strategic move. Output JSON only:\n{\"row\": <0-7>, \"col\": <0-7>}")
+
+	sb.WriteString("\nBriefly explain your choice (1–2 sentences), then output your move as JSON on the final line:\n{\"row\": <0-7>, \"col\": <0-7>}")
 	return sb.String()
 }
 
