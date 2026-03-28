@@ -16,7 +16,11 @@ cd llm-othello
 go mod tidy
 ```
 
-Edit `config.toml` to point at your LLM server:
+Copy `config.toml.example` to `config.toml` and edit to point at your LLM server:
+
+```sh
+cp config.toml.example config.toml
+```
 
 ```toml
 [llm]
