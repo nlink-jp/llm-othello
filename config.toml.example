@@ -1,0 +1,8 @@
+[llm]
+base_url    = "http://localhost:1234"  # LM Studio default
+model       = "local-model"            # change to your loaded model name
+api_key     = ""                       # leave empty for local LLM
+temperature = 0.0                      # deterministic strategy
+
+[server]
+port = 8080
