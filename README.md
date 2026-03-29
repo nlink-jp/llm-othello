@@ -42,7 +42,7 @@ Or build first:
 
 ```bash
 make build
-./llm-othello
+./dist/llm-othello
 ```
 
 ## Configuration
