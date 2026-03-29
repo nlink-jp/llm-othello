@@ -9,9 +9,10 @@ GOMODCACHE  ?= $(HOME)/go/pkg/mod
 
 LDFLAGS := -s -w -X main.version=$(VERSION)
 
-## build: Build binary for the current platform → ./$(BINARY)
+## build: Build binary for the current platform → dist/$(BINARY)
 build:
-	go build -ldflags "$(LDFLAGS)" -o $(BINARY) .
+	@mkdir -p dist
+	go build -ldflags "$(LDFLAGS)" -o dist/$(BINARY) .
 
 ## build-all: Cross-compile for all target platforms → dist/
 build-all:
@@ -39,7 +40,6 @@ test:
 
 ## clean: Remove build artifacts
 clean:
-	rm -f $(BINARY)
 	rm -rf dist/
 
 .PHONY: build build-all package test clean
