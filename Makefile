@@ -27,12 +27,16 @@ build-all:
 ## package: Cross-compile and create .zip archives → dist/
 package: build-all
 	$(foreach platform,$(PLATFORMS), \
-		$(eval OS   := $(word 1,$(subst /, ,$(platform)))) \
-		$(eval ARCH := $(word 2,$(subst /, ,$(platform)))) \
-		$(eval EXT  := $(if $(filter windows,$(OS)),.exe,)) \
-		$(eval BIN  := dist/$(BINARY)_$(OS)_$(ARCH)$(EXT)) \
-		$(eval ZIP  := dist/$(BINARY)_$(OS)_$(ARCH).zip) \
-		zip -j $(ZIP) $(BIN) config.toml ;)
+		$(eval OS    := $(word 1,$(subst /, ,$(platform)))) \
+		$(eval ARCH  := $(word 2,$(subst /, ,$(platform)))) \
+		$(eval EXT   := $(if $(filter windows,$(OS)),.exe,)) \
+		$(eval BIN   := dist/$(BINARY)_$(OS)_$(ARCH)$(EXT)) \
+		$(eval ZIP   := dist/$(BINARY)_$(OS)_$(ARCH).zip) \
+		$(eval STAGE := dist/_pkg-$(OS)-$(ARCH)) \
+		rm -rf $(STAGE) && mkdir -p $(STAGE) ; \
+		cp $(BIN) $(STAGE)/$(BINARY)$(EXT) ; \
+		zip -j $(ZIP) $(STAGE)/$(BINARY)$(EXT) config.toml ; \
+		rm -rf $(STAGE) ;)
 
 ## test: Run tests
 test:
