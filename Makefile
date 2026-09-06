@@ -2,7 +2,7 @@ BINARY  := llm-othello
 MODULE  := github.com/nlink-jp/$(BINARY)
 VERSION := $(shell git describe --tags --always --dirty 2>/dev/null || echo "dev")
 
-PLATFORMS := linux/amd64 linux/arm64 darwin/amd64 darwin/arm64 windows/amd64
+PLATFORMS := linux/amd64 linux/arm64 darwin/arm64 windows/amd64
 
 GOCACHE     ?= $(HOME)/.cache/go-build
 GOMODCACHE  ?= $(HOME)/go/pkg/mod
